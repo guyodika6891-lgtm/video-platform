@@ -36,7 +36,7 @@ Visit **http://127.0.0.1:5000**
 ## 🚀 Deploy to Render.com
 
 1. Push repo to GitHub.
-2. Go to https://render.com → **New → Blueprint**.
+2. Go to https://video-platform-mpcl.onrender.com → **New → Blueprint**.
 3. Connect your GitHub repo — Render reads `render.yaml`.
 4. Wait for build → done.
 
