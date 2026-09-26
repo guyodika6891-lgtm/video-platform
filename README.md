@@ -21,7 +21,7 @@ A simple video sharing platform built with **Flask**, **SQLAlchemy**, **Flask-Lo
 ## 🖥️ Run Locally
 
 ```bash
-git clone https://github.com/<your-username>/video-platform.git
+git clone https://github.com/guyodika6891-lgtm/video-platform.git
 cd video-platform
 
 python -m venv .venv
