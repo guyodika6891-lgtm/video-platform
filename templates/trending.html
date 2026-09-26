@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-fire text-danger"></i> Trending</h4>
+{% if videos %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+  {% for v in videos %}{% include "partials/_video_card.html" %}{% endfor %}
+</div>
+{% else %}<div class="alert alert-info">No videos yet.</div>{% endif %}
+{% endblock %}

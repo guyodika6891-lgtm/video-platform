@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-collection-play"></i> Subscriptions</h4>
+
+{% if channels %}
+<div class="d-flex flex-wrap gap-2 mb-4">
+  {% for c in channels %}
+    <a href="{{ url_for('channel', username=c.username) }}" class="btn btn-sm btn-outline-secondary rounded-pill">{{ c.username }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if videos %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+  {% for v in videos %}{% include "partials/_video_card.html" %}{% endfor %}
+</div>
+{% else %}<div class="alert alert-info">Subscribe to channels to see their new videos here.</div>{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h4 class="mb-4"><i class="bi bi-gear"></i> Settings</h4>
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">{{ form.bio.label(class="form-label") }}{{ form.bio(class="form-control", rows="3") }}</div>
+          <div class="mb-3">{{ form.avatar_url.label(class="form-label") }}{{ form.avatar_url(class="form-control", placeholder="https://...") }}</div>
+          <div class="mb-3">{{ form.banner_url.label(class="form-label") }}{{ form.banner_url(class="form-control", placeholder="https://...") }}</div>
+          <button class="btn btn-primary">{{ form.submit.label.text }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

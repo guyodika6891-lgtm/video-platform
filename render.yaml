@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: videohub
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && pip install psycopg2-binary==2.9.10"
+    startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 300 --preload"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DATABASE_URL
+        fromDatabase:
+          name: videohub-db
+          property: connectionString
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+databases:
+  - name: videohub-db
+    plan: free
+    databaseName: videohub

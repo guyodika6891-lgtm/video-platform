@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0"><i class="bi bi-clock-history"></i> Watch History</h4>
+  <form method="post" action="{{ url_for('clear_history') }}" onsubmit="return confirm('Clear all history?');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-sm btn-outline-danger">Clear</button>
+  </form>
+</div>
+{% if videos %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+  {% for v in videos %}{% include "partials/_video_card.html" %}{% endfor %}
+</div>
+{% else %}<div class="alert alert-info">No history yet.</div>{% endif %}
+{% endblock %}

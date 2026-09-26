@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}VideoHub{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid px-lg-4">
+    <button class="btn btn-dark d-lg-none me-2" id="sidebarToggle"><i class="bi bi-list"></i></button>
+
+    <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('index') }}">
+      <i class="bi bi-play-btn-fill text-danger me-1"></i> VideoHub
+    </a>
+
+    <form class="d-none d-md-flex mx-auto" style="max-width:520px; width:100%;" action="{{ url_for('index') }}">
+      <input class="form-control rounded-start-pill" name="q" placeholder="Search videos..." value="{{ request.args.get('q','') }}">
+      <button class="btn btn-outline-light rounded-end-pill"><i class="bi bi-search"></i></button>
+    </form>
+
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button class="btn btn-dark" id="themeToggle" title="Toggle theme"><i class="bi bi-moon-stars"></i></button>
+
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('upload') }}" class="btn btn-danger btn-sm">
+          <i class="bi bi-upload"></i> <span class="d-none d-md-inline">Upload</span>
+        </a>
+        <div class="dropdown">
+          <a class="d-flex align-items-center text-decoration-none dropdown-toggle text-light" data-bs-toggle="dropdown">
+            {% if current_user.avatar_url %}
+              <img src="{{ current_user.avatar_url }}" class="rounded-circle" width="32" height="32" style="object-fit:cover;">
+            {% else %}
+              <span class="rounded-circle bg-danger d-inline-flex align-items-center justify-content-center"
+                    style="width:32px;height:32px;">{{ current_user.username[0]|upper }}</span>
+            {% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow">
+            <li><a class="dropdown-item" href="{{ url_for('channel', username=current_user.username) }}"><i class="bi bi-person"></i> My Channel</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('history') }}"><i class="bi bi-clock-history"></i> History</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('watch_later_page') }}"><i class="bi bi-bookmark"></i> Watch Later</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('settings') }}"><i class="bi bi-gear"></i> Settings</a></li>
+            {% if current_user.is_admin %}
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{{ url_for('admin') }}"><i class="bi bi-shield-lock"></i> Admin</a></li>
+            {% endif %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+          </ul>
+        </div>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-sm">Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Register</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="d-flex flex-grow-1">
+
+  <!-- Sidebar -->
+  <aside class="sidebar bg-body-tertiary border-end p-3" id="sidebar">
+    <ul class="nav flex-column gap-1">
+      <li><a class="nav-link rounded {% if request.endpoint=='index' %}active{% endif %}" href="{{ url_for('index') }}"><i class="bi bi-house-door me-2"></i> Home</a></li>
+      <li><a class="nav-link rounded {% if request.endpoint=='trending' %}active{% endif %}" href="{{ url_for('trending') }}"><i class="bi bi-fire me-2"></i> Trending</a></li>
+      {% if current_user.is_authenticated %}
+        <li><a class="nav-link rounded {% if request.endpoint=='subscriptions_feed' %}active{% endif %}" href="{{ url_for('subscriptions_feed') }}"><i class="bi bi-collection-play me-2"></i> Subscriptions</a></li>
+      {% endif %}
+      <li><hr></li>
+      {% if current_user.is_authenticated %}
+        <li><a class="nav-link rounded" href="{{ url_for('history') }}"><i class="bi bi-clock-history me-2"></i> History</a></li>
+        <li><a class="nav-link rounded" href="{{ url_for('watch_later_page') }}"><i class="bi bi-bookmark me-2"></i> Watch Later</a></li>
+        <li><a class="nav-link rounded" href="{{ url_for('channel', username=current_user.username) }}"><i class="bi bi-person-circle me-2"></i> My Channel</a></li>
+      {% endif %}
+      <li><hr></li>
+      <li class="px-2 small text-muted text-uppercase">Categories</li>
+      {% for c in ['Music','Gaming','Education','Technology','Sports','News','Entertainment','Comedy','Travel'] %}
+        <li><a class="nav-link rounded" href="{{ url_for('index', category=c) }}"><i class="bi bi-tag me-2"></i> {{ c }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-grow-1 p-3 p-lg-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }} alert-dismissible fade show shadow-sm">
+          {{ msg }}
+          <button class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<footer class="bg-dark text-light py-3 mt-auto">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center small">
+    <span>© {{ 2025 }} VideoHub · Made with Flask + Bootstrap</span>
+    <span><a class="link-light text-decoration-none" href="{{ url_for('healthz') }}">status</a></span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

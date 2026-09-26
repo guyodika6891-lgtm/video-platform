@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }} · Channel{% endblock %}
+{% block content %}
+
+<div class="rounded overflow-hidden shadow-sm mb-4" style="height:180px; background:#333 url('{{ user.banner_url or '' }}') center/cover;">
+</div>
+
+<div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+  {% if user.avatar_url %}
+    <img src="{{ user.avatar_url }}" class="rounded-circle" width="90" height="90" style="object-fit:cover;">
+  {% else %}
+    <span class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width:90px;height:90px;font-size:2rem;">{{ user.username[0]|upper }}</span>
+  {% endif %}
+  <div class="flex-grow-1">
+    <h3 class="mb-1">{{ user.username }}</h3>
+    <div class="text-muted small">
+      {{ user.subscriber_count|humanize }} subscribers · {{ user.videos.count() }} videos · {{ user.total_views|humanize }} views
+    </div>
+    {% if user.bio %}<p class="mt-2 mb-0">{{ user.bio }}</p>{% endif %}
+  </div>
+
+  {% if current_user.is_authenticated and current_user.id != user.id %}
+    <button class="btn {% if is_sub %}btn-outline-secondary{% else %}btn-danger{% endif %} subscribe-btn" data-username="{{ user.username }}">
+      {% if is_sub %}Subscribed{% else %}Subscribe{% endif %}
+    </button>
+  {% endif %}
+</div>
+
+{% if videos %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+  {% for v in videos %}
+    {% include "partials/_video_card.html" %}
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">No videos yet.</div>
+{% endif %}
+
+{% endblock %}

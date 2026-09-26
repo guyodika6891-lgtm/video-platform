@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if trending and not q and not category %}
+<h4 class="mb-3"><i class="bi bi-fire text-danger"></i> Trending this week</h4>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 mb-5">
+  {% for v in trending %}
+    {% include "partials/_video_card.html" %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<h4 class="mb-3">
+  {% if q %} Results for "{{ q }}"
+  {% elif category %} {{ category }}
+  {% else %} Latest videos {% endif %}
+</h4>
+
+{% if videos %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+  {% for v in videos %}
+    {% include "partials/_video_card.html" %}
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">No videos found.</div>
+{% endif %}
+
+{% endblock %}

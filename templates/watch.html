@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ video.title }} · VideoHub{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm bg-black">
+      <video controls autoplay poster="{{ video.thumb }}">
+        <source src="{{ video.play_url }}">
+      </video>
+    </div>
+
+    <h4 class="mt-3 mb-2">{{ video.title }}</h4>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <div class="d-flex align-items-center gap-3">
+        <a href="{{ url_for('channel', username=video.owner.username) }}" class="text-decoration-none">
+          {% if video.owner.avatar_url %}
+            <img src="{{ video.owner.avatar_url }}" class="rounded-circle" width="42" height="42" style="object-fit:cover;">
+          {% else %}
+            <span class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center" style="width:42px;height:42px;">{{ video.owner.username[0]|upper }}</span>
+          {% endif %}
+        </a>
+        <div>
+          <a class="fw-semibold text-decoration-none text-body" href="{{ url_for('channel', username=video.owner.username) }}">{{ video.owner.username }}</a>
+          <div class="small text-muted">{{ video.owner.subscriber_count|humanize }} subscribers</div>
+        </div>
+        {% if current_user.is_authenticated and current_user.id != video.owner.id %}
+          <button class="btn btn-sm btn-danger subscribe-btn" data-username="{{ video.owner.username }}">
+            Subscribe
+          </button>
+        {% endif %}
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-sm btn-outline-secondary like-btn {% if liked %}active{% endif %}" data-video="{{ video.id }}">
+          <i class="bi bi-hand-thumbs-up"></i> <span id="likeCount">{{ video.like_count }}</span>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary wl-btn" data-video="{{ video.id }}">
+          <i class="bi bi-bookmark{% if in_watch_later %}-fill{% endif %}"></i> Save
+        </button>
+        {% if current_user.is_authenticated and (current_user.id == video.user_id or current_user.is_admin) %}
+          <a href="{{ url_for('edit_video', video_id=video.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Edit</a>
+          <form method="post" action="{{ url_for('delete_video', video_id=video.id) }}" onsubmit="return confirm('Delete this video?');" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="bg-body-tertiary rounded p-3 mb-4">
+      <div class="small text-muted mb-1">
+        {{ video.views|humanize }} views · {{ video.created_at|time_ago }} · <span class="badge bg-secondary">{{ video.category }}</span>
+      </div>
+      <p class="mb-0" style="white-space: pre-wrap;">{{ video.description or "No description." }}</p>
+    </div>
+
+    <div id="comments">
+      <h5>Comments ({{ video.comment_count }})</h5>
+
+      {% if current_user.is_authenticated %}
+        <form method="post" action="{{ url_for('post_comment', video_id=video.id) }}" class="mb-4">
+          {{ form.hidden_tag() }}
+          <div class="mb-2">{{ form.body(class="form-control", rows="3", placeholder="Add a comment...") }}</div>
+          <button class="btn btn-primary btn-sm">Post</button>
+        </form>
+      {% else %}
+        <div class="alert alert-secondary"><a href="{{ url_for('login') }}">Login</a> to comment.</div>
+      {% endif %}
+
+      {% for c in comments %}
+        <div class="d-flex gap-3 mb-3">
+          {% if c.author.avatar_url %}
+            <img src="{{ c.author.avatar_url }}" class="rounded-circle" width="40" height="40" style="object-fit:cover;">
+          {% else %}
+            <span class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center" style="width:40px;height:40px;">{{ c.author.username[0]|upper }}</span>
+          {% endif %}
+          <div class="flex-grow-1">
+            <div class="small">
+              <a class="fw-semibold text-decoration-none text-body" href="{{ url_for('channel', username=c.author.username) }}">{{ c.author.username }}</a>
+              <span class="text-muted">· {{ c.created_at|time_ago }}</span>
+            </div>
+            <div style="white-space: pre-wrap;">{{ c.body }}</div>
+            {% if current_user.is_authenticated and (current_user.id == c.user_id or current_user.is_admin) %}
+              <form method="post" action="{{ url_for('delete_comment', comment_id=c.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-link btn-sm text-danger p-0">Delete</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <p class="text-muted">No comments yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <h5 class="mb-3">Related videos</h5>
+    <div class="d-flex flex-column gap-3">
+      {% for v in related %}
+        <a href="{{ url_for('watch', video_id=v.id) }}" class="text-decoration-none text-body d-flex gap-2">
+          {% if v.thumb and v.thumb != '/static/img/placeholder.jpg' %}
+            <img src="{{ v.thumb }}" width="140" height="80" class="rounded" style="object-fit:cover;">
+          {% else %}
+            <div class="bg-dark rounded d-flex align-items-center justify-content-center text-light" style="width:140px;height:80px;"><i class="bi bi-play-circle"></i></div>
+          {% endif %}
+          <div class="min-w-0">
+            <div class="fw-semibold small text-truncate-2">{{ v.title }}</div>
+            <div class="small text-muted">{{ v.owner.username }}</div>
+            <div class="small text-muted">{{ v.views|humanize }} views</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

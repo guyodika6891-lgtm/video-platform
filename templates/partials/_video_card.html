@@ -1,0 +1,35 @@
+<div class="col">
+  <div class="card h-100 video-card border-0 shadow-sm">
+    <a href="{{ url_for('watch', video_id=v.id) }}" class="text-decoration-none">
+      {% if v.thumb and v.thumb != '/static/img/placeholder.jpg' %}
+        <img src="{{ v.thumb }}" class="card-img-top thumb" alt="{{ v.title }}">
+      {% else %}
+        <div class="thumb bg-dark d-flex align-items-center justify-content-center text-light">
+          <i class="bi bi-play-circle display-5"></i>
+        </div>
+      {% endif %}
+    </a>
+    <div class="card-body">
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('channel', username=v.owner.username) }}" class="text-decoration-none">
+          {% if v.owner.avatar_url %}
+            <img src="{{ v.owner.avatar_url }}" class="rounded-circle" width="36" height="36" style="object-fit:cover;">
+          {% else %}
+            <span class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;">{{ v.owner.username[0]|upper }}</span>
+          {% endif %}
+        </a>
+        <div class="flex-grow-1 min-w-0">
+          <a href="{{ url_for('watch', video_id=v.id) }}" class="text-decoration-none text-body">
+            <h6 class="mb-1 text-truncate-2">{{ v.title }}</h6>
+          </a>
+          <div class="small text-muted text-truncate">
+            <a href="{{ url_for('channel', username=v.owner.username) }}" class="text-decoration-none text-muted">{{ v.owner.username }}</a>
+          </div>
+          <div class="small text-muted">
+            {{ v.views|humanize }} views · {{ v.created_at|time_ago }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

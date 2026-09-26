@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-shield-lock text-danger"></i> Admin Dashboard</h4>
+
+<div class="row g-3 mb-4">
+  {% for label, value in [('Users', stats.users), ('Videos', stats.videos), ('Views', stats.views), ('Comments', stats.comments)] %}
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center">
+      <div class="card-body">
+        <div class="text-muted small">{{ label }}</div>
+        <div class="fs-3 fw-bold">{{ value }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<h5>Recent Users</h5>
+<div class="table-responsive mb-4">
+  <table class="table align-middle">
+    <thead><tr><th>Username</th><th>Email</th><th>Admin</th><th></th></tr></thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td><a href="{{ url_for('channel', username=u.username) }}">{{ u.username }}</a></td>
+        <td>{{ u.email }}</td>
+        <td>{% if u.is_admin %}<span class="badge bg-success">yes</span>{% else %}<span class="badge bg-secondary">no</span>{% endif %}</td>
+        <td>
+          <form method="post" action="{{ url_for('toggle_admin', user_id=u.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-secondary">Toggle admin</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h5>Recent Videos</h5>
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead><tr><th>Title</th><th>Owner</th><th>Views</th><th></th></tr></thead>
+    <tbody>
+      {% for v in videos %}
+      <tr>
+        <td><a href="{{ url_for('watch', video_id=v.id) }}">{{ v.title }}</a></td>
+        <td>{{ v.owner.username }}</td>
+        <td>{{ v.views }}</td>
+        <td>
+          <form method="post" action="{{ url_for('delete_video', video_id=v.id) }}" onsubmit="return confirm('Delete?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

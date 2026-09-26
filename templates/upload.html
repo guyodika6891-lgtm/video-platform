@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h4 class="mb-4"><i class="bi bi-cloud-upload text-danger"></i> Upload Video</h4>
+        <form method="post" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control", placeholder="Enter a catchy title") }}
+            {% for e in form.title.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", rows="4", placeholder="Tell viewers about your video") }}
+          </div>
+          <div class="mb-3">
+            {{ form.category.label(class="form-label") }}
+            {{ form.category(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Video file (.mp4, .webm, .ogg, .mov)</label>
+            <input type="file" class="form-control" name="video" accept="video/*" required>
+            <div class="form-text">Max 500 MB. Uploads are stored on Cloudinary (if configured) or locally.</div>
+          </div>
+          <button class="btn btn-danger w-100">
+            <i class="bi bi-upload"></i> {{ form.submit.label.text }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
